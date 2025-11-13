@@ -118,7 +118,7 @@ belajar-nodejs-restful-api/
 
 ```bash
 # 1. Clone repository
-git clone ttps://github.com/hilmiyahya19/belajar-nodejs-restful-api.git
+git clone https://github.com/hilmiyahya19/belajar-nodejs-restful-api.git
 
 # 2. Install dependencies
 npm install
