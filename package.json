@@ -7,16 +7,11 @@
   "type": "module",
   "main": "src/main.js",
   "scripts": {
-    "test": "jest -i",
-    "test:address": "jest -i tests/address.test.js",
-    "test:contact": "jest -i tests/contact.test.js",
-    "test:util": "jest -i tests/test-util.js",
-    "test:user": "jest -i tests/user.test.js"
-},
-  "jest": {
-    "transform": {
-      "^.+\\.[t|j]sx?$": "babel-jest"
-    }
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest -i",
+    "test:address": "cross-env NODE_OPTIONS=--experimental-vm-modules jest -i tests/address.test.js",
+    "test:contact": "cross-env NODE_OPTIONS=--experimental-vm-modules jest -i tests/contact.test.js",
+    "test:util": "cross-env NODE_OPTIONS=--experimental-vm-modules jest -i tests/test-util.js",
+    "test:user": "cross-env NODE_OPTIONS=--experimental-vm-modules jest -i tests/user.test.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
@@ -34,6 +29,7 @@
     "@types/supertest": "^6.0.3",
     "@types/uuid": "^10.0.0",
     "babel-jest": "^30.2.0",
+    "cross-env": "^10.1.0",
     "jest": "^30.2.0",
     "prisma": "^6.19.0",
     "supertest": "^7.1.4"
