@@ -1,8 +1,9 @@
 import supertest from "supertest";
 import {web} from "../src/application/web.js";
 // import { prismaClient } from "../src/application/database.js";
-import { createTestUser, removeTestUser } from "./test-util.js";
+import { createTestUser, getTestUser, removeTestUser } from "./test-util.js";
 import { logger } from "../src/application/logging.js";
+import bcrypt from "bcrypt";
 
 describe('POST /api/users', () => {
 
@@ -166,9 +167,82 @@ describe ('GET /api/users/current', () => {
             .get('/api/users/current')
             .set('Authorization', 'salah');
 
-        logger.info(response.body);
+        // logger.info(response.body);
 
         expect(response.status).toBe(401);
         expect(response.body.errors).toBeDefined();
+    });
+})
+
+describe ('PATCH /api/users/current', () => {
+    beforeEach(async () => {
+        await createTestUser();
+    })
+
+    afterEach(async () => {
+        await removeTestUser();
+    });
+
+    it ('should can update current user', async () => {
+        const response = await supertest(web)
+            .patch('/api/users/current')
+            .set('Authorization', 'test')
+            .send({
+                name: 'Hilmi',
+                password: '654321',
+            });
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.username).toBe('test');
+        expect(response.body.data.name).toBe('Hilmi');        
+
+        const user = await getTestUser();
+        expect(await bcrypt.compare('654321', user.password)).toBe(true);
+    });
+
+    it ('should can update current user name', async () => {
+        const response = await supertest(web)
+            .patch('/api/users/current')
+            .set('Authorization', 'test')
+            .send({
+                name: 'Hilmi',
+            });
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.username).toBe('test');
+        expect(response.body.data.name).toBe('Hilmi');        
+    });
+
+    it ('should can update current user password', async () => {
+        const response = await supertest(web)
+            .patch('/api/users/current')
+            .set('Authorization', 'test')
+            .send({
+                password: '654321',
+            });
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.username).toBe('test');
+        expect(response.body.data.name).toBe('test');
+        
+        const user = await getTestUser();
+        expect(await bcrypt.compare('654321', user.password)).toBe(true);
+    });
+
+    it ('should reject if request body is invalid', async () => {
+        const response = await supertest(web)
+            .patch('/api/users/current')
+            .set('Authorization', 'salah')
+            .send({});
+
+        logger.info(response.body);
+
+        expect(response.status).toBe(401);
     });
 })
