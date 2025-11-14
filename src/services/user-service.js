@@ -1,48 +1,56 @@
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
-import { loginUserValidation, registerUserValidation } from "../validations/user-validation.js"
-import { validate } from "../validations/validation.js"
+import { getUserValidation, loginUserValidation, registerUserValidation } from "../validations/user-validation.js";
+import { validate } from "../validations/validation.js";
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 
+// ================================================
+// REGISTER USER
+// ================================================
 const register = async (request) => {
-    const user = validate(registerUserValidation, request);
+    // validate input
+    const validatedData = validate(registerUserValidation, request);
 
-    // check if username already exists in database
-    // method count() returns the number of users with the same username
-    const countUser = await prismaClient.user.count({
+    // cek username apakah sudah dipakai
+    const existingUserCount = await prismaClient.user.count({
         where: {
-            username: user.username
+            username: validatedData.username
         }
     });
 
-    // Throw an error if countUser === 1, which means a user with the same username already exists in the database
-    if(countUser === 1) {
+    if (existingUserCount === 1) {
         throw new ResponseError(400, "Username already exists");
     }
 
     // hash password
-    user.password = await bcrypt.hash(user.password, 10);
+    const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+    validatedData.password = hashedPassword;
 
-    // create user
-    const newUser = await prismaClient.user.create({
-        data: user,
+    // create user di database
+    const createdUser = await prismaClient.user.create({
+        data: validatedData,
         select: {
             username: true,
             name: true
         }
     });
 
-    return newUser;
-}
+    return createdUser;
+};
 
+
+// ================================================
+// LOGIN USER
+// ================================================
 const login = async (request) => {
-    const loginRequest = validate(loginUserValidation, request);
+    // validate input login
+    const validatedLogin = validate(loginUserValidation, request);
 
-    // find user by username in database
-    const user = await prismaClient.user.findUnique({
+    // cari user berdasarkan username
+    const foundUser = await prismaClient.user.findUnique({
         where: {
-            username: loginRequest.username
+            username: validatedLogin.username
         },
         select: {
             username: true,
@@ -50,31 +58,63 @@ const login = async (request) => {
         }
     });
 
-    // if user not found, throw an error
-    if (!user) {
+    if (!foundUser) {
         throw new ResponseError(401, "Username or password wrong");
     }
 
-    const isPasswordValid = await bcrypt.compare(loginRequest.password, user.password);
-    if (!isPasswordValid) {
+    // verifikasi password
+    const passwordMatch = await bcrypt.compare(validatedLogin.password, foundUser.password);
+    if (!passwordMatch) {
         throw new ResponseError(401, "Username or password wrong");
     }
 
-    const token = uuid().toString();
-    return prismaClient.user.update({
+    // generate token login baru
+    const generatedToken = uuid().toString();
+
+    // simpan token ke database dan kembalikan ke client
+    const updatedUser = await prismaClient.user.update({
         data: {
-            token: token
+            token: generatedToken
         },
         where: {
-            username: user.username
+            username: foundUser.username
         },
         select: {
             token: true
         }
     });
-}
+
+    return updatedUser;
+};
+
+
+// ================================================
+// GET USER BY USERNAME
+// ================================================
+const get = async (username) => {
+    // validate input username
+    username = validate(getUserValidation, username);
+
+    // ambil data user berdasarkan username
+    const foundUser = await prismaClient.user.findUnique({
+        where: {
+            username: username
+        },
+        select: {
+            username: true,
+            name: true
+        }
+    });
+
+    if (!foundUser) {
+        throw new ResponseError(404, "User not found");
+    }
+
+    return foundUser;
+};
 
 export default {
     register,
-    login
-}
+    login,
+    get
+};

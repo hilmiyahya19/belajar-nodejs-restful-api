@@ -90,7 +90,7 @@ describe('POST /api/users/login', () => {
                 password: '123456'
         });
 
-        logger.info(response.body);
+        // logger.info(response.body);
 
         expect(response.status).toBe(200);
         expect(response.body.data.token).toBeDefined();
@@ -105,7 +105,7 @@ describe('POST /api/users/login', () => {
                 password: ''
         });
 
-        logger.info(response.body);
+        // logger.info(response.body);
 
         expect(response.status).toBe(400);
         expect(response.body.errors).toBeDefined();
@@ -119,7 +119,7 @@ describe('POST /api/users/login', () => {
                 password: 'salah'
         });
 
-        logger.info(response.body);
+        // logger.info(response.body);
 
         expect(response.status).toBe(401);
         expect(response.body.errors).toBeDefined();
@@ -133,9 +133,42 @@ describe('POST /api/users/login', () => {
                 password: 'salah'
         });
 
-        logger.info(response.body);
+        // logger.info(response.body);
 
         expect(response.status).toBe(401);
         expect(response.body.errors).toBeDefined();
     });
 });
+
+describe ('GET /api/users/current', () => {
+    beforeEach(async () => {
+        await createTestUser();
+    })
+
+    afterEach(async () => {
+        await removeTestUser();
+    });
+
+    it ('should can get current user', async () => {
+        const response = await supertest(web)
+            .get('/api/users/current')
+            .set('Authorization', 'test');
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.username).toBe('test');
+        expect(response.body.data.name).toBe('test');
+    });
+
+    it ('should reject if token is invalid', async () => {
+        const response = await supertest(web)
+            .get('/api/users/current')
+            .set('Authorization', 'salah');
+
+        logger.info(response.body);
+
+        expect(response.status).toBe(401);
+        expect(response.body.errors).toBeDefined();
+    });
+})

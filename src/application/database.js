@@ -1,7 +1,7 @@
-
 import { PrismaClient } from "@prisma/client";
 import { logger } from "./logging.js";
 
+// untuk logging prisma
 export const prismaClient = new PrismaClient({
     log: [
         {
