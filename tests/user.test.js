@@ -5,6 +5,9 @@ import { createTestUser, getTestUser, removeTestUser } from "./test-util.js";
 import { logger } from "../src/application/logging.js";
 import bcrypt from "bcrypt";
 
+// ================================================
+// TEST REGISTER USER
+// ================================================
 describe('POST /api/users', () => {
 
     afterEach(async () => {
@@ -74,6 +77,9 @@ describe('POST /api/users', () => {
     });
 });
 
+// ================================================
+// TEST LOGIN USER
+// ================================================
 describe('POST /api/users/login', () => {
     beforeEach(async () => {
         await createTestUser();
@@ -141,6 +147,9 @@ describe('POST /api/users/login', () => {
     });
 });
 
+// ================================================
+// TEST GET USER
+// ================================================
 describe ('GET /api/users/current', () => {
     beforeEach(async () => {
         await createTestUser();
@@ -174,6 +183,9 @@ describe ('GET /api/users/current', () => {
     });
 })
 
+// ================================================
+// TEST PATCH USER
+// ================================================
 describe ('PATCH /api/users/current', () => {
     beforeEach(async () => {
         await createTestUser();
@@ -240,6 +252,44 @@ describe ('PATCH /api/users/current', () => {
             .patch('/api/users/current')
             .set('Authorization', 'salah')
             .send({});
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(401);
+    });
+})
+
+// ================================================
+// TEST LOGOUT USER
+// ================================================
+describe ('DELETE /api/users/logout', () => {
+    beforeEach(async () => {
+        await createTestUser();
+    })
+
+    afterEach(async () => {
+        await removeTestUser();
+    });
+
+    it ('should can logout user', async () => {
+        const response = await supertest(web)
+            .delete('/api/users/logout')
+            .set('Authorization', 'test');
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data).toBe('OK');
+
+        // cek di database, token harus null
+        const user = await getTestUser();
+        expect(user.token).toBeNull();
+    });
+
+    it ('should reject logout if token is invalid', async () => {
+        const response = await supertest(web)
+            .delete('/api/users/logout')
+            .set('Authorization', 'salah');
 
         logger.info(response.body);
 

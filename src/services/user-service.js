@@ -157,11 +157,47 @@ const update = async (request) => {
 };
 
 // ================================================
+// LOGOUT USER
+// ================================================
+const logout = async (username) => {
+    // validate input username
+    username = validate(getUserValidation, username);
+
+    // ambil data user berdasarkan username
+    const foundUser = await prismaClient.user.findUnique({
+        where: {
+            username: username
+        }
+    });
+
+    if (!foundUser) {
+        throw new ResponseError(404, "User not found");
+    }
+
+    // simpan token ke database dan kembalikan ke client
+    const updatedUser = await prismaClient.user.update({
+        where: {
+            username: foundUser.username
+        },
+        data: {
+            token: null
+        },
+        select: {
+            username: true
+        }
+    });
+
+    return updatedUser;
+}
+
+
+// ================================================
 // EXPORT
 // ================================================
 export default {
     register,
     login,
     get,
-    update
+    update,
+    logout
 };
