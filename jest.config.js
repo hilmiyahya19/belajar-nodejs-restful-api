@@ -2,7 +2,10 @@ export default {
   transform: {
     "^.+\\.[tj]sx?$": "babel-jest",
   },
+
   transformIgnorePatterns: [
-    "node_modules/(?!(uuid)/)" // proses ulang uuid agar bisa dibaca Jest
+    "node_modules/(?!(uuid)/)", // proses ulang uuid agar bisa dibaca Jest
   ],
+
+  globalTeardown: "./tests/jest-global-teardown.js",
 };
