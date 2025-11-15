@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import { logger } from "../src/application/logging.js";
 import { web } from "../src/application/web.js";
-import { createTestContact, createTestUser, getTestContact, removeAllTestContacts, removeTestUser } from "./test-util.js";
+import { createManyTestContacts, createTestContact, createTestUser, getTestContact, removeAllTestContacts, removeTestUser } from "./test-util.js";
 
 // ================================================
 // TEST POST CONTACT
@@ -217,5 +217,102 @@ describe('DELETE /api/contacts/:contactId', () => {
 
         expect(response.status).toBe(404);
         expect(response.body.errors).toBeDefined();
+    });
+})
+
+// ================================================
+// TEST SEARCH CONTACT
+// ================================================
+describe('GET /api/contacts', () => {
+    beforeEach(async () => {
+        await createTestUser();
+        await createManyTestContacts();
+    })
+
+    afterEach(async () => {
+        await removeAllTestContacts();
+        await removeTestUser();
+    });
+
+    it('should can search contact without parameter', async () => {
+        const response = await supertest(web)
+            .get('/api/contacts')
+            .set('Authorization', 'test');
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(10);
+        expect(response.body.paging.page).toBe(1);
+        expect(response.body.paging.total_page).toBe(2);
+        expect(response.body.paging.total_item).toBe(15);
+    });
+
+    it('should can search to page 2', async () => {
+        const response = await supertest(web)
+            .get('/api/contacts')
+            .query({ 
+                page: 2 
+            })
+            .set('Authorization', 'test');
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(5);
+        expect(response.body.paging.page).toBe(2);
+        expect(response.body.paging.total_page).toBe(2);
+        expect(response.body.paging.total_item).toBe(15);
+    });
+
+    it('should can searrch using name', async () => {
+        const response = await supertest(web)
+            .get('/api/contacts')
+            .query({ 
+                name: 'test 1' 
+            })
+            .set('Authorization', 'test');
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(6);
+        expect(response.body.paging.page).toBe(1);
+        expect(response.body.paging.total_page).toBe(1);
+        expect(response.body.paging.total_item).toBe(6);
+    });
+
+    it('should can searrch using email', async () => {
+        const response = await supertest(web)
+            .get('/api/contacts')
+            .query({ 
+                email: 'test1' 
+            })
+            .set('Authorization', 'test');
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(6);
+        expect(response.body.paging.page).toBe(1);
+        expect(response.body.paging.total_page).toBe(1);
+        expect(response.body.paging.total_item).toBe(6);
+    });
+
+    it('should can searrch using phone', async () => {
+        const response = await supertest(web)
+            .get('/api/contacts')
+            .query({ 
+                phone: '0812345678901' 
+            })
+            .set('Authorization', 'test');
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(6);
+        expect(response.body.paging.page).toBe(1);
+        expect(response.body.paging.total_page).toBe(1);
+        expect(response.body.paging.total_item).toBe(6);
     });
 })
