@@ -99,3 +99,79 @@ describe ('GET /api/contacts/:contactId', () => {
         expect(response.body.errors).toBeDefined();
     });
 })
+
+// ================================================
+// TEST UPDATE CONTACT
+// ================================================
+describe('PUT /api/contacts/:contactId', () => {
+    beforeEach(async () => {
+        await createTestUser();
+        await createTestContact();
+    })
+
+    afterEach(async () => {
+        await removeAllTestContacts();
+        await removeTestUser();
+    });
+
+    it('should can update contact', async () => {
+        const testContact = await getTestContact();
+
+        const response = await supertest(web)
+            .put('/api/contacts/' + testContact.id)
+            .set('Authorization', 'test')
+            .send({
+                first_name: 'Hilmi',
+                last_name: 'Yahya',
+                email: 'hilmi@gmail.com',
+                phone: '081234567890'
+        });
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.id).toBe(testContact.id);
+        expect(response.body.data.first_name).toBe('Hilmi');
+        expect(response.body.data.last_name).toBe('Yahya');
+        expect(response.body.data.email).toBe('hilmi@gmail.com');
+        expect(response.body.data.phone).toBe('081234567890');
+    });
+
+    it('should reject if request body is invalid', async () => {
+        const testContact = await getTestContact();
+
+        const response = await supertest(web)
+            .put('/api/contacts/' + testContact.id)
+            .set('Authorization', 'test')
+            .send({
+                first_name: '',
+                last_name: '',
+                email: 'hilmi',
+                phone: ''
+        });
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(400);
+        expect(response.body.errors).toBeDefined();
+    });
+
+    it('should reject if contact id not found', async () => {
+        const testContact = await getTestContact();
+
+        const response = await supertest(web)
+            .put('/api/contacts/' + testContact.id + 1)
+            .set('Authorization', 'test')
+            .send({
+                first_name: 'Hilmi',
+                last_name: 'Yahya',
+                email: 'hilmi@gmail.com',
+                phone: '081234567890'
+        });
+
+        logger.info(response.body);
+
+        expect(response.status).toBe(404);
+        expect(response.body.errors).toBeDefined();
+    });
+})
