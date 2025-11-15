@@ -169,7 +169,51 @@ describe('PUT /api/contacts/:contactId', () => {
                 phone: '081234567890'
         });
 
-        logger.info(response.body);
+        // logger.info(response.body);
+
+        expect(response.status).toBe(404);
+        expect(response.body.errors).toBeDefined();
+    });
+})
+
+// ================================================
+// TEST DELETE CONTACT
+// ================================================
+describe('DELETE /api/contacts/:contactId', () => {
+    beforeEach(async () => {
+        await createTestUser();
+        await createTestContact();
+    })
+
+    afterEach(async () => {
+        await removeAllTestContacts();
+        await removeTestUser();
+    });
+
+    it('should can delete contact', async () => {
+        const testContact = await getTestContact();
+
+        const response = await supertest(web)
+            .delete('/api/contacts/' + testContact.id)
+            .set('Authorization', 'test');
+
+        // logger.info(response.body);
+
+        expect(response.status).toBe(200);
+        expect(response.body.data).toBe("OK");
+
+        const contact = await getTestContact();
+        expect(contact).toBeNull();
+    });
+
+    it('should reject if contact id not found', async () => {
+        const testContact = await getTestContact();
+
+        const response = await supertest(web)
+            .delete('/api/contacts/' + testContact.id + 1)
+            .set('Authorization', 'test');
+
+        // logger.info(response.body);
 
         expect(response.status).toBe(404);
         expect(response.body.errors).toBeDefined();
