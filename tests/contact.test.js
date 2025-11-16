@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { logger } from "../src/application/logging.js";
+// import { logger } from "../src/application/logging.js";
 import { web } from "../src/application/web.js";
 import { createManyTestContacts, createTestContact, createTestUser, getTestContact, removeAllTestContacts, removeTestUser } from "./test-util.js";
 
