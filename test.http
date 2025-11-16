@@ -1,0 +1,147 @@
+### register user
+POST http://localhost:3000/api/users
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username": "hilmi",
+    "password": "123456",
+    "name": "Hilmi Yahya"
+}
+
+### login user
+### 23678d71-b360-44c2-9305-b3fdff259386
+
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username": "hilmi",
+    "password": "123456"
+}
+
+### get user current
+
+GET http://localhost:3000/api/users/current
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+### patch user current
+
+PATCH http://localhost:3000/api/users/current
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+{
+    "name": "Hilmi Yahya Lagi"
+}
+
+### logout user
+
+DELETE http://localhost:3000/api/users/logout
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+### post contact
+
+POST http://localhost:3000/api/contacts
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+{
+    "first_name": "Primordial",
+    "last_name": "One",
+    "email": "phanes@gmail.com",
+    "phone": "081234567890"
+}
+
+### get all contacts or get contacts by parameter
+
+GET http://localhost:3000/api/contacts
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+### get contact by id
+
+GET http://localhost:3000/api/contacts/1088
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+### put contact
+
+PUT http://localhost:3000/api/contacts/1088
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+{
+    "first_name": "Heavenly",
+    "last_name": "Principles",
+    "email": "firstdescender@gmail.com",
+    "phone": "081234567899"
+}
+
+### delete contact
+
+DELETE http://localhost:3000/api/contacts/1088
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+### post address
+
+POST http://localhost:3000/api/contacts/1089/addresses
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+{
+    "street": "jalan2",
+    "city": "kota2",
+    "province": "provinsi2",
+    "country": "negara2",
+    "postal_code": "222222"
+}
+
+### list addresses
+
+GET http://localhost:3000/api/contacts/1089/addresses
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+### get address detail
+
+GET http://localhost:3000/api/contacts/1089/addresses/102
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+### put address
+
+PUT http://localhost:3000/api/contacts/1089/addresses/103
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
+
+{
+    "street": "jalan3",
+    "city": "kota3",
+    "province": "provinsi3",
+    "country": "negara3",
+    "postal_code": "333333"
+}
+
+### delete address
+
+DELETE http://localhost:3000/api/contacts/1089/addresses/103
+Content-Type: application/json
+Accept: application/json
+Authorization: 23678d71-b360-44c2-9305-b3fdff259386
